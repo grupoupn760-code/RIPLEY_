@@ -1,0 +1,431 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:modelos="clr-namespace:RipleyComprasMAUI.Models"
+             x:Class="RipleyComprasMAUI.UI.MainPage"
+             Title="Ripley">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <!-- ===================== Encabezado y menú ===================== -->
+        <Grid Grid.Row="0" Padding="20,10" ColumnDefinitions="Auto,*" ColumnSpacing="28"
+              BackgroundColor="{StaticResource ColorPrimarioOscuro}">
+            <Label Text="Ripley" FontSize="30" FontFamily="OpenSansSemibold" TextColor="White" VerticalOptions="Center" />
+            <HorizontalStackLayout Grid.Column="1" Spacing="6" VerticalOptions="Center">
+                <Button x:Name="btnNavPreventa" Text="Preventa" Style="{StaticResource BotonMenu}" Clicked="OnNavegarClicked" />
+                <Button x:Name="btnNavVenta" Text="Venta" Style="{StaticResource BotonMenu}" Clicked="OnNavegarClicked" />
+                <Button x:Name="btnNavBoleta" Text="Boleta" Style="{StaticResource BotonMenu}" Clicked="OnNavegarClicked" />
+                <Button x:Name="btnNavBitacora" Text="Bitácora" Style="{StaticResource BotonMenu}" Clicked="OnNavegarClicked" />
+                <Button x:Name="btnNavRed" Text="Red de cajas" Style="{StaticResource BotonMenu}" Clicked="OnNavegarClicked" />
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- ===================== Mensaje de la última acción ===================== -->
+        <Border x:Name="brdMensaje" Grid.Row="1" Margin="20,10,20,0" Padding="14,8" Style="{StaticResource Tarjeta}">
+            <Label x:Name="lblMensaje" Text="Cargando..." />
+        </Border>
+
+        <Grid Grid.Row="2">
+
+            <!-- ===================================================================== -->
+            <!-- PREVENTA: búsqueda y catálogo a la izquierda, carrito separado a la derecha -->
+            <!-- ===================================================================== -->
+            <ScrollView x:Name="seccionPreventa">
+                <Grid Padding="20,14" ColumnDefinitions="3*,2*" RowDefinitions="Auto,*" ColumnSpacing="18" RowSpacing="10">
+                    <Label Grid.ColumnSpan="2" Text="Preventa" Style="{StaticResource EtiquetaTitulo}" />
+
+                    <Border Grid.Row="1" Style="{StaticResource Tarjeta}" VerticalOptions="Start">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Buscar por código" Style="{StaticResource EtiquetaSubtitulo}" />
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <Entry x:Name="txtCodigo" Placeholder="Código de 13 dígitos" Keyboard="Numeric"
+                                       TextChanged="OnCodigoCambiado" Completed="OnBuscarCodigoClicked" />
+                                <Button x:Name="btnBuscarCodigo" Grid.Column="1" Text="Buscar" WidthRequest="120" IsEnabled="False" Clicked="OnBuscarCodigoClicked" />
+                            </Grid>
+                            <Label x:Name="lblErrorCodigo" Style="{StaticResource EtiquetaError}" IsVisible="False" />
+
+                            <Label Text="Buscar por nombre" Style="{StaticResource EtiquetaSubtitulo}" />
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <Entry x:Name="txtNombreBuscar" Placeholder="Nombre o parte del nombre"
+                                       TextChanged="OnNombreBuscarCambiado" Completed="OnBuscarNombreClicked" />
+                                <Button x:Name="btnBuscarNombre" Grid.Column="1" Text="Buscar" WidthRequest="120" IsEnabled="False" Clicked="OnBuscarNombreClicked" />
+                            </Grid>
+                            <Label x:Name="lblErrorNombreBuscar" Style="{StaticResource EtiquetaError}" IsVisible="False" />
+
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <Label x:Name="lblResultadoBusqueda" VerticalOptions="Center" Style="{StaticResource EtiquetaSuave}" />
+                                <Button Grid.Column="1" Text="Ver catálogo" Style="{StaticResource BotonSecundario}" Clicked="OnListarCatalogoClicked" />
+                            </Grid>
+
+                            <Border Style="{StaticResource Tarjeta}" Padding="2">
+                                <CollectionView x:Name="cvProductos" HeightRequest="300" SelectionMode="Single"
+                                                SelectionChanged="OnProductoSeleccionado" EmptyView="Busca un producto o abre el catálogo.">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="modelos:Producto">
+                                            <Grid Style="{StaticResource FilaLista}" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                                <Label Text="{Binding Nombre}" FontFamily="OpenSansSemibold" />
+                                                <Label Grid.Row="1" Text="{Binding Codigo}" Style="{StaticResource EtiquetaSuave}" />
+                                                <Label Grid.Column="1" HorizontalTextAlignment="End" Text="{Binding PrecioRegular, StringFormat='S/ {0:0.00}'}" />
+                                                <Label Grid.Row="1" Grid.Column="1" HorizontalTextAlignment="End" Style="{StaticResource EtiquetaSuave}">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text="{Binding PrecioTarjetaRipley, StringFormat='T. Ripley S/ {0:0.00}'}" />
+                                                            <Span Text="{Binding Stock, StringFormat=' · {0} disponibles'}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </Border>
+
+                            <Label x:Name="lblProductoSeleccionado" FontFamily="OpenSansSemibold" />
+                            <Grid ColumnDefinitions="Auto,90,*" ColumnSpacing="10">
+                                <Label Text="Cantidad" VerticalOptions="Center" />
+                                <Entry x:Name="txtCantidadAgregar" Grid.Column="1" Keyboard="Numeric" TextChanged="OnCantidadAgregarCambiada" />
+                                <Button x:Name="btnAgregar" Grid.Column="2" Text="Agregar al carrito" IsEnabled="False" Clicked="OnAgregarClicked" />
+                            </Grid>
+                            <Label x:Name="lblErrorCantidadAgregar" Style="{StaticResource EtiquetaError}" IsVisible="False" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource TarjetaResaltada}" VerticalOptions="Start">
+                        <VerticalStackLayout Spacing="8">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="Carrito" Style="{StaticResource EtiquetaTitulo}" />
+                                <Label x:Name="lblTituloCarrito" Grid.Column="1" VerticalOptions="Center" Style="{StaticResource EtiquetaSuave}" />
+                            </Grid>
+                            <Border Style="{StaticResource Tarjeta}" Padding="2">
+                                <CollectionView x:Name="cvCarrito" HeightRequest="230" SelectionMode="Single"
+                                                SelectionChanged="OnArticuloCarritoSeleccionado" EmptyView="El carrito está vacío.">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="modelos:ItemCarrito">
+                                            <Grid Style="{StaticResource FilaLista}" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                                <Label Text="{Binding Nombre}" FontFamily="OpenSansSemibold" />
+                                                <Label Grid.Row="1" Text="{Binding PrecioRegular, StringFormat='S/ {0:0.00} c/u'}" Style="{StaticResource EtiquetaSuave}" />
+                                                <Label Grid.Column="1" HorizontalTextAlignment="End" FontFamily="OpenSansSemibold"
+                                                       Text="{Binding Cantidad, StringFormat='x {0}'}" />
+                                                <Label Grid.Row="1" Grid.Column="1" HorizontalTextAlignment="End"
+                                                       Text="{Binding SubtotalRegular, StringFormat='S/ {0:0.00}'}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </Border>
+
+                            <FlexLayout Wrap="Wrap" AlignItems="Center">
+                                <Button x:Name="btnMenos" Text="−" WidthRequest="46" Margin="0,0,6,6" IsEnabled="False" Clicked="OnMenosClicked" />
+                                <Button x:Name="btnMas" Text="+" WidthRequest="46" Margin="0,0,6,6" IsEnabled="False" Clicked="OnMasClicked" />
+                                <Entry x:Name="txtNuevaCantidad" WidthRequest="70" Placeholder="Cant." Keyboard="Numeric" Margin="0,0,6,6"
+                                       TextChanged="OnNuevaCantidadCambiada" />
+                                <Button x:Name="btnCambiarCantidad" Text="Cambiar" Margin="0,0,6,6" Style="{StaticResource BotonSecundario}" IsEnabled="False" Clicked="OnCambiarCantidadClicked" />
+                                <Button x:Name="btnQuitar" Text="Quitar" Margin="0,0,6,6" Style="{StaticResource BotonPeligro}" IsEnabled="False" Clicked="OnQuitarClicked" />
+                                <Button x:Name="btnDeshacer" Text="Deshacer" Margin="0,0,6,6" Style="{StaticResource BotonSecundario}" Clicked="OnDeshacerClicked" />
+                                <Button x:Name="btnVaciar" Text="Vaciar" Margin="0,0,6,6" Style="{StaticResource BotonSecundario}" IsEnabled="False" Clicked="OnVaciarClicked" />
+                            </FlexLayout>
+                            <Label x:Name="lblErrorNuevaCantidad" Style="{StaticResource EtiquetaError}" IsVisible="False" />
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="Total" VerticalOptions="Center" Style="{StaticResource EtiquetaSubtitulo}" />
+                                <Label x:Name="lblTotalRegular" Grid.Column="1" Style="{StaticResource EtiquetaTotal}" />
+                            </Grid>
+                            <Label x:Name="lblEstimadoRipley" Style="{StaticResource EtiquetaSuave}" HorizontalTextAlignment="End" />
+
+                            <Label Text="Cliente (opcional)" Style="{StaticResource EtiquetaSubtitulo}" Margin="0,6,0,0" />
+                            <Entry x:Name="txtClienteNombre" Placeholder="Nombre" TextChanged="OnDatosClienteCambiados" />
+                            <Grid ColumnDefinitions="*,2*" ColumnSpacing="8">
+                                <Entry x:Name="txtClienteDni" Placeholder="DNI (8 dígitos)" Keyboard="Numeric" TextChanged="OnDatosClienteCambiados" />
+                                <Entry x:Name="txtClienteCorreo" Grid.Column="1" Placeholder="Correo" Keyboard="Email" TextChanged="OnDatosClienteCambiados" />
+                            </Grid>
+                            <Label x:Name="lblErrorCliente" Style="{StaticResource EtiquetaError}" IsVisible="False" />
+
+                            <Button x:Name="btnEnviarCaja" Text="Enviar a caja" Style="{StaticResource BotonDestacado}" IsEnabled="False" Clicked="OnEnviarCajaClicked" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+            </ScrollView>
+
+            <!-- ===================================================================== -->
+            <!-- VENTA: fila a la izquierda; cliente en caja y pago a la derecha        -->
+            <!-- ===================================================================== -->
+            <ScrollView x:Name="seccionVenta" IsVisible="False">
+                <Grid Padding="20,14" ColumnDefinitions="2*,3*" RowDefinitions="Auto,*" ColumnSpacing="18" RowSpacing="10">
+                    <Label Grid.ColumnSpan="2" Text="Venta" Style="{StaticResource EtiquetaTitulo}" />
+
+                    <Border Grid.Row="1" Style="{StaticResource Tarjeta}" VerticalOptions="Start">
+                        <VerticalStackLayout Spacing="10">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="Fila" Style="{StaticResource EtiquetaSubtitulo}" VerticalOptions="Center" />
+                                <Label x:Name="lblInfoFila" Grid.Column="1" Style="{StaticResource EtiquetaSuave}" VerticalOptions="Center" />
+                            </Grid>
+                            <Button x:Name="btnAtenderSiguiente" Text="Atender siguiente" Style="{StaticResource BotonDestacado}" Clicked="OnAtenderSiguienteClicked" />
+                            <Border Style="{StaticResource Tarjeta}" Padding="2">
+                                <CollectionView x:Name="cvFila" HeightRequest="420" SelectionMode="None" EmptyView="No hay clientes en espera.">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="modelos:Venta">
+                                            <Grid Style="{StaticResource FilaLista}" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                                <Label FontFamily="OpenSansSemibold">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text="{Binding Turno, StringFormat='Turno {0}'}" />
+                                                            <Span Text="{Binding ClienteTexto, StringFormat=' · {0}'}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                                <Label Grid.Row="1" Text="{Binding Unidades, StringFormat='{0} producto(s)'}" Style="{StaticResource EtiquetaSuave}" />
+                                                <Label Grid.Column="1" Grid.RowSpan="2" VerticalOptions="Center" HorizontalTextAlignment="End"
+                                                       Text="{Binding TotalRegular, StringFormat='S/ {0:0.00}'}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <VerticalStackLayout Grid.Row="1" Grid.Column="1" Spacing="14">
+                        <Border x:Name="brdSinCompra" Style="{StaticResource Tarjeta}" Padding="24">
+                            <Label Text="No hay un cliente en caja. Pulsa Atender siguiente." HorizontalTextAlignment="Center" Style="{StaticResource EtiquetaSubtitulo}" />
+                        </Border>
+
+                        <VerticalStackLayout x:Name="panelCompra" Spacing="14" IsVisible="False">
+                            <Border Style="{StaticResource Tarjeta}">
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Text="En caja" Style="{StaticResource EtiquetaSubtitulo}" />
+                                    <Label x:Name="lblCompraActual" />
+                                    <Border Style="{StaticResource Tarjeta}" Padding="2">
+                                        <CollectionView x:Name="cvArticulosCaja" HeightRequest="190" SelectionMode="Single"
+                                                        SelectionChanged="OnArticuloCajaSeleccionado" EmptyView="La compra no tiene productos.">
+                                            <CollectionView.ItemTemplate>
+                                                <DataTemplate x:DataType="modelos:ItemCarrito">
+                                                    <Grid Style="{StaticResource FilaLista}" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                                        <Label Text="{Binding Nombre}" FontFamily="OpenSansSemibold" />
+                                                        <Label Grid.Row="1" Style="{StaticResource EtiquetaSuave}">
+                                                            <Label.FormattedText>
+                                                                <FormattedString>
+                                                                    <Span Text="{Binding Cantidad, StringFormat='{0} x '}" />
+                                                                    <Span Text="{Binding PrecioAplicado, StringFormat='S/ {0:0.00}'}" />
+                                                                </FormattedString>
+                                                            </Label.FormattedText>
+                                                        </Label>
+                                                        <Label Grid.Column="1" Grid.RowSpan="2" VerticalOptions="Center" HorizontalTextAlignment="End"
+                                                               FontFamily="OpenSansSemibold" Text="{Binding SubtotalAplicado, StringFormat='S/ {0:0.00}'}" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </CollectionView.ItemTemplate>
+                                        </CollectionView>
+                                    </Border>
+                                    <Label Text="Corregir compra" Style="{StaticResource EtiquetaSuave}" />
+                                    <FlexLayout Wrap="Wrap" AlignItems="Center">
+                                        <Entry x:Name="txtCantidadCaja" WidthRequest="70" Placeholder="Cant." Keyboard="Numeric" Margin="0,0,6,6"
+                                               TextChanged="OnCantidadCajaCambiada" />
+                                        <Button x:Name="btnCorregirCantidad" Text="Cambiar cantidad" Margin="0,0,6,6" Style="{StaticResource BotonSecundario}" IsEnabled="False" Clicked="OnCorregirCantidadClicked" />
+                                        <Button x:Name="btnQuitarCaja" Text="Quitar" Margin="0,0,6,6" Style="{StaticResource BotonPeligro}" IsEnabled="False" Clicked="OnQuitarCajaClicked" />
+                                        <Button x:Name="btnDeshacerCaja" Text="Deshacer" Margin="0,0,6,6" Style="{StaticResource BotonSecundario}" IsEnabled="False" Clicked="OnDeshacerCajaClicked" />
+                                    </FlexLayout>
+                                    <Label x:Name="lblErrorCantidadCaja" Style="{StaticResource EtiquetaError}" IsVisible="False" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Style="{StaticResource TarjetaResaltada}">
+                                <VerticalStackLayout Spacing="10">
+                                    <Label Text="Pago" Style="{StaticResource EtiquetaTitulo}" />
+                                    <Label Text="Medio de pago" Style="{StaticResource EtiquetaSubtitulo}" />
+                                    <Picker x:Name="pkTarjeta" Title="Selecciona una tarjeta" IsEnabled="False" SelectedIndexChanged="OnTarjetaCambiada">
+                                        <Picker.Items>
+                                            <x:String>Tarjeta Ripley</x:String>
+                                            <x:String>Otra tarjeta</x:String>
+                                        </Picker.Items>
+                                    </Picker>
+                                    <Label x:Name="lblAvisoTarjeta" Style="{StaticResource EtiquetaError}" />
+
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="4">
+                                        <Label Text="Total regular" />
+                                        <Label x:Name="lblCajaRegular" Grid.Column="1" HorizontalTextAlignment="End" />
+                                        <Label Grid.Row="1" Text="Ahorro" FontFamily="OpenSansSemibold" TextColor="{StaticResource ColorExito}" />
+                                        <Label x:Name="lblCajaAhorro" Grid.Row="1" Grid.Column="1" HorizontalTextAlignment="End"
+                                               FontFamily="OpenSansSemibold" TextColor="{StaticResource ColorExito}" />
+                                        <Label Grid.Row="2" Text="Operación gravada" Style="{StaticResource EtiquetaSuave}" />
+                                        <Label x:Name="lblCajaGravada" Grid.Row="2" Grid.Column="1" HorizontalTextAlignment="End" Style="{StaticResource EtiquetaSuave}" />
+                                        <Label Grid.Row="3" Text="IGV (18 %)" Style="{StaticResource EtiquetaSuave}" />
+                                        <Label x:Name="lblCajaIgv" Grid.Row="3" Grid.Column="1" HorizontalTextAlignment="End" Style="{StaticResource EtiquetaSuave}" />
+                                    </Grid>
+                                    <BoxView HeightRequest="1" Color="{StaticResource ColorBorde}" />
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Text="Total a pagar" VerticalOptions="Center" Style="{StaticResource EtiquetaSubtitulo}" />
+                                        <Label x:Name="lblCajaFinal" Grid.Column="1" Style="{StaticResource EtiquetaTotal}" />
+                                    </Grid>
+                                    <Button x:Name="btnConfirmarPago" Text="Confirmar pago" Style="{StaticResource BotonDestacado}" IsEnabled="False" Clicked="OnConfirmarPagoClicked" />
+                                    <Button x:Name="btnRetirarCompra" Text="Retirar compra" Style="{StaticResource BotonSecundario}" IsEnabled="False" Clicked="OnRetirarCompraClicked" />
+                                </VerticalStackLayout>
+                            </Border>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Grid>
+            </ScrollView>
+
+            <!-- ===================================================================== -->
+            <!-- BOLETA: búsquedas y resultados a la izquierda; boleta elegida a la derecha -->
+            <!-- ===================================================================== -->
+            <ScrollView x:Name="seccionBoleta" IsVisible="False">
+                <Grid Padding="20,14" ColumnDefinitions="*,*" RowDefinitions="Auto,*" ColumnSpacing="18" RowSpacing="10">
+                    <Label Grid.ColumnSpan="2" Text="Boleta" Style="{StaticResource EtiquetaTitulo}" />
+
+                    <VerticalStackLayout Grid.Row="1" Spacing="12">
+                        <Border Style="{StaticResource Tarjeta}">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Buscar boleta" Style="{StaticResource EtiquetaSubtitulo}" />
+                                <Grid ColumnDefinitions="70,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="6">
+                                    <Label Text="Número" VerticalOptions="Center" />
+                                    <Entry x:Name="txtNumeroBoleta" Grid.Column="1" Placeholder="Ej. 1" Keyboard="Numeric"
+                                           TextChanged="OnNumeroBoletaCambiado" Completed="OnBuscarNumeroClicked" />
+                                    <Button x:Name="btnBuscarNumero" Grid.Column="2" Text="Buscar" WidthRequest="110" IsEnabled="False" Clicked="OnBuscarNumeroClicked" />
+                                    <Label x:Name="lblErrorNumero" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource EtiquetaError}" IsVisible="False" />
+
+                                    <Label Grid.Row="2" Text="DNI" VerticalOptions="Center" />
+                                    <Entry x:Name="txtDniBuscar" Grid.Row="2" Grid.Column="1" Placeholder="8 dígitos" Keyboard="Numeric"
+                                           TextChanged="OnDniBuscarCambiado" Completed="OnBuscarDniClicked" />
+                                    <Button x:Name="btnBuscarDni" Grid.Row="2" Grid.Column="2" Text="Buscar" WidthRequest="110" IsEnabled="False" Clicked="OnBuscarDniClicked" />
+                                    <Label x:Name="lblErrorDniBuscar" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource EtiquetaError}" IsVisible="False" />
+
+                                    <Label Grid.Row="4" Text="Fecha" VerticalOptions="Center" />
+                                    <DatePicker x:Name="dpFecha" Grid.Row="4" Grid.Column="1" Format="dd/MM/yyyy" />
+                                    <Button Grid.Row="4" Grid.Column="2" Text="Buscar" WidthRequest="110" Clicked="OnBuscarFechaClicked" />
+                                </Grid>
+                                <Button Text="Ver todas" Style="{StaticResource BotonSecundario}" HorizontalOptions="Start" Clicked="OnVerTodasClicked" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <Border Style="{StaticResource Tarjeta}">
+                            <VerticalStackLayout Spacing="8">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="Resultados" Style="{StaticResource EtiquetaSubtitulo}" />
+                                    <Label x:Name="lblResultadoVentas" Grid.Column="1" Style="{StaticResource EtiquetaSuave}" />
+                                </Grid>
+                                <CollectionView x:Name="cvVentas" HeightRequest="280" SelectionMode="Single"
+                                                SelectionChanged="OnVentaSeleccionada" EmptyView="Sin boletas para mostrar.">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="modelos:Venta">
+                                            <Grid Style="{StaticResource FilaLista}" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                                <Label FontFamily="OpenSansSemibold">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text="{Binding Boleta.Numero, StringFormat='N° {0:D6}'}" />
+                                                            <Span Text="{Binding ClienteTexto, StringFormat=' · {0}'}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                                <Label Grid.Row="1" Style="{StaticResource EtiquetaSuave}">
+                                                    <Label.FormattedText>
+                                                        <FormattedString>
+                                                            <Span Text="{Binding Boleta.FechaEmision, StringFormat='{0:dd/MM/yyyy HH:mm}'}" />
+                                                            <Span Text="{Binding TarjetaTexto, StringFormat=' · {0}'}" />
+                                                        </FormattedString>
+                                                    </Label.FormattedText>
+                                                </Label>
+                                                <Label Grid.Column="1" Grid.RowSpan="2" VerticalOptions="Center" FontFamily="OpenSansSemibold"
+                                                       Text="{Binding TotalFinal, StringFormat='S/ {0:0.00}'}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                                <Label x:Name="lblInfoBoletas" Style="{StaticResource EtiquetaSuave}" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource TarjetaResaltada}" VerticalOptions="Start">
+                        <VerticalStackLayout Spacing="10">
+                            <Label x:Name="lblBoletaSeleccionada" Text="Ninguna boleta seleccionada" Style="{StaticResource EtiquetaTitulo}" />
+                            <Border Style="{StaticResource Tarjeta}">
+                                <Label x:Name="lblDetalleBoleta" FontFamily="Consolas" FontSize="13" LineBreakMode="NoWrap"
+                                       Text="Elige una boleta de los resultados para ver su detalle." />
+                            </Border>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+            </ScrollView>
+
+            <!-- ===================================================================== -->
+            <!-- BITÁCORA: filtro y registros                                           -->
+            <!-- ===================================================================== -->
+            <Grid x:Name="seccionBitacora" IsVisible="False" Padding="20,14" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="10">
+                <Label Text="Bitácora" Style="{StaticResource EtiquetaTitulo}" />
+                <Grid Grid.Row="1" ColumnDefinitions="Auto,380,Auto" ColumnSpacing="10">
+                    <Label Text="Mostrar" VerticalOptions="Center" Style="{StaticResource EtiquetaSubtitulo}" />
+                    <Picker x:Name="pkBitacora" Grid.Column="1" SelectedIndexChanged="OnFiltroBitacoraCambiado">
+                        <Picker.Items>
+                            <x:String>Todos los subprocesos</x:String>
+                            <x:String>Preventa - Selección de productos</x:String>
+                            <x:String>Venta - Pago</x:String>
+                            <x:String>Postventa - Boleta</x:String>
+                        </Picker.Items>
+                    </Picker>
+                    <Button Grid.Column="2" Text="Actualizar" Style="{StaticResource BotonSecundario}" Clicked="OnActualizarBitacoraClicked" />
+                </Grid>
+                <Border Grid.Row="2" Style="{StaticResource Tarjeta}" Padding="4">
+                    <CollectionView x:Name="cvBitacora" SelectionMode="None" EmptyView="Sin registros.">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Label Text="{Binding .}" Padding="10,4" FontSize="13" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Border>
+                <Grid Grid.Row="3" ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                    <Label Text="Carpeta de datos" VerticalOptions="Center" Style="{StaticResource EtiquetaSuave}" />
+                    <Entry x:Name="txtCarpetaDatos" Grid.Column="1" IsReadOnly="True" FontSize="12" />
+                </Grid>
+            </Grid>
+
+            <!-- ===================================================================== -->
+            <!-- RED DE CAJAS: primero la ruta; los enlaces van en una sección aparte   -->
+            <!-- ===================================================================== -->
+            <ScrollView x:Name="seccionRed" IsVisible="False">
+                <Grid Padding="20,14" ColumnDefinitions="*,*" RowDefinitions="Auto,*" ColumnSpacing="18" RowSpacing="10">
+                    <Label Grid.ColumnSpan="2" Text="Red de cajas" Style="{StaticResource EtiquetaTitulo}" />
+
+                    <Border Grid.Row="1" Style="{StaticResource TarjetaResaltada}" VerticalOptions="Start">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Ruta más corta" Style="{StaticResource EtiquetaSubtitulo}" />
+                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="4">
+                                <Label Text="Origen" />
+                                <Label Grid.Column="1" Text="Destino" />
+                                <Picker x:Name="pkOrigen" Grid.Row="1" Title="Elige el origen" />
+                                <Picker x:Name="pkDestino" Grid.Row="1" Grid.Column="1" Title="Elige el destino" />
+                            </Grid>
+                            <Button Text="Calcular ruta" Style="{StaticResource BotonDestacado}" Clicked="OnRutaMinimaClicked" />
+                            <Label x:Name="lblRuta" FontSize="15" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Tarjeta}" VerticalOptions="Start">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Enlaces" Style="{StaticResource EtiquetaSubtitulo}" />
+                            <Label Text="Se aplica al enlace entre el origen y el destino elegidos." Style="{StaticResource EtiquetaSuave}" />
+                            <FlexLayout Wrap="Wrap" AlignItems="Center">
+                                <Button Text="Activar" Margin="0,0,6,6" Style="{StaticResource BotonSecundario}" Clicked="OnActivarEnlaceClicked" />
+                                <Button Text="Desactivar" Margin="0,0,6,6" Style="{StaticResource BotonPeligro}" Clicked="OnDesactivarEnlaceClicked" />
+                                <Entry x:Name="txtPeso" WidthRequest="110" Placeholder="Tiempo (ms)" Keyboard="Numeric" Margin="0,0,6,6"
+                                       TextChanged="OnPesoCambiado" />
+                                <Button x:Name="btnCambiarPeso" Text="Cambiar tiempo" Margin="0,0,6,6" Style="{StaticResource BotonSecundario}" IsEnabled="False" Clicked="OnCambiarPesoClicked" />
+                            </FlexLayout>
+                            <Label x:Name="lblErrorPeso" Style="{StaticResource EtiquetaError}" IsVisible="False" />
+                            <Border Style="{StaticResource Tarjeta}" Padding="2">
+                                <CollectionView x:Name="cvEnlaces" HeightRequest="260" SelectionMode="None">
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="x:String">
+                                            <Label Text="{Binding .}" Padding="10,5" />
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            </Border>
+                            <Button Text="Restaurar red" Style="{StaticResource BotonSecundario}" HorizontalOptions="Start" Clicked="OnRestablecerGrafoClicked" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+            </ScrollView>
+        </Grid>
+    </Grid>
+</ContentPage>

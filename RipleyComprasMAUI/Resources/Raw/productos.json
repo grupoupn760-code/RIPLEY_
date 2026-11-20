@@ -1,0 +1,51 @@
+[
+  {
+    "Codigo": "2015371440865",
+    "Nombre": "SWE ML DESTAR INX CO",
+    "PrecioRegular": 19.99,
+    "PrecioTarjetaRipley": 19.99,
+    "Stock": 20
+  },
+  {
+    "Codigo": "2015371441190",
+    "Nombre": "SWE ML DETEJ INX CO",
+    "PrecioRegular": 19.99,
+    "PrecioTarjetaRipley": 19.99,
+    "Stock": 20
+  },
+  {
+    "Codigo": "2015372278467",
+    "Nombre": "FALDA LARG FESTIDO I",
+    "PrecioRegular": 89.99,
+    "PrecioTarjetaRipley": 89.99,
+    "Stock": 20
+  },
+  {
+    "Codigo": "2015372601050",
+    "Nombre": "JEANS FITS ME WIDE L",
+    "PrecioRegular": 89.99,
+    "PrecioTarjetaRipley": 89.99,
+    "Stock": 20
+  },
+  {
+    "Codigo": "2015373379330",
+    "Nombre": "POL MC ESTRE INX COR",
+    "PrecioRegular": 49.99,
+    "PrecioTarjetaRipley": 49.99,
+    "Stock": 20
+  },
+  {
+    "Codigo": "2015373474714",
+    "Nombre": "POL MC FEPAPAYA INX",
+    "PrecioRegular": 59.99,
+    "PrecioTarjetaRipley": 39.99,
+    "Stock": 20
+  },
+  {
+    "Codigo": "2072369066599",
+    "Nombre": "HI ML CUERNO AZI COR",
+    "PrecioRegular": 19.99,
+    "PrecioTarjetaRipley": 19.99,
+    "Stock": 20
+  }
+]

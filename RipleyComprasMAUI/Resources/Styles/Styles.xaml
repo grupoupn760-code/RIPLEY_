@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- ========== Página ========== -->
+    <Style TargetType="Page" ApplyToDerivedTypes="True">
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="BackgroundColor" Value="{StaticResource ColorFondo}" />
+    </Style>
+
+    <!-- ========== Etiquetas ========== -->
+    <Style x:Key="EtiquetaBase" TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource ColorTexto}" />
+        <Setter Property="FontFamily" Value="OpenSansRegular" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="LineBreakMode" Value="WordWrap" />
+    </Style>
+    <Style TargetType="Label" BasedOn="{StaticResource EtiquetaBase}" />
+
+    <Style x:Key="EtiquetaTitulo" TargetType="Label" BasedOn="{StaticResource EtiquetaBase}">
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="TextColor" Value="{StaticResource ColorPrimario}" />
+    </Style>
+
+    <Style x:Key="EtiquetaSubtitulo" TargetType="Label" BasedOn="{StaticResource EtiquetaBase}">
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+    </Style>
+
+    <Style x:Key="EtiquetaSuave" TargetType="Label" BasedOn="{StaticResource EtiquetaBase}">
+        <Setter Property="TextColor" Value="{StaticResource ColorTextoSuave}" />
+        <Setter Property="FontSize" Value="13" />
+    </Style>
+
+    <Style x:Key="EtiquetaError" TargetType="Label" BasedOn="{StaticResource EtiquetaBase}">
+        <Setter Property="TextColor" Value="{StaticResource ColorError}" />
+        <Setter Property="FontSize" Value="13" />
+    </Style>
+
+    <Style x:Key="EtiquetaMonto" TargetType="Label" BasedOn="{StaticResource EtiquetaBase}">
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="16" />
+    </Style>
+
+    <!-- ========== Botones ========== -->
+    <Style x:Key="BotonBase" TargetType="Button">
+        <Setter Property="TextColor" Value="{StaticResource White}" />
+        <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimario}" />
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="14,8" />
+        <Setter Property="MinimumHeightRequest" Value="40" />
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal" />
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="TextColor" Value="{StaticResource ColorTextoSuave}" />
+                            <Setter Property="BackgroundColor" Value="{StaticResource ColorDeshabilitado}" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="PointerOver" />
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+    <Style TargetType="Button" BasedOn="{StaticResource BotonBase}" />
+
+    <Style x:Key="BotonSecundario" TargetType="Button" BasedOn="{StaticResource BotonBase}">
+        <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimarioClaro}" />
+        <Setter Property="TextColor" Value="{StaticResource ColorPrimario}" />
+    </Style>
+
+    <Style x:Key="BotonPeligro" TargetType="Button" BasedOn="{StaticResource BotonBase}">
+        <Setter Property="BackgroundColor" Value="{StaticResource ColorError}" />
+    </Style>
+
+    <!-- Acción principal de cada pantalla: Agregar, Enviar a caja, Atender siguiente, Confirmar pago, Calcular ruta -->
+    <Style x:Key="BotonDestacado" TargetType="Button" BasedOn="{StaticResource BotonBase}">
+        <Setter Property="BackgroundColor" Value="{StaticResource ColorAcento}" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="MinimumHeightRequest" Value="50" />
+        <Setter Property="CornerRadius" Value="8" />
+    </Style>
+
+    <!-- Menú superior: el código pinta la sección activa (fondo blanco, texto morado) -->
+    <Style x:Key="BotonMenu" TargetType="Button" BasedOn="{StaticResource BotonBase}">
+        <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimarioOscuro}" />
+        <Setter Property="TextColor" Value="{StaticResource White}" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Padding" Value="18,8" />
+    </Style>
+
+    <!-- ========== Entradas ========== -->
+    <Style TargetType="Entry">
+        <Setter Property="TextColor" Value="{StaticResource ColorTexto}" />
+        <Setter Property="BackgroundColor" Value="{StaticResource ColorSuperficie}" />
+        <Setter Property="PlaceholderColor" Value="{StaticResource ColorTextoSuave}" />
+        <Setter Property="FontFamily" Value="OpenSansRegular" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="MinimumHeightRequest" Value="40" />
+    </Style>
+
+    <Style TargetType="Picker">
+        <Setter Property="TextColor" Value="{StaticResource ColorTexto}" />
+        <Setter Property="TitleColor" Value="{StaticResource ColorTextoSuave}" />
+        <Setter Property="BackgroundColor" Value="{StaticResource ColorSuperficie}" />
+        <Setter Property="FontFamily" Value="OpenSansRegular" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="MinimumHeightRequest" Value="40" />
+    </Style>
+
+    <Style TargetType="DatePicker">
+        <Setter Property="TextColor" Value="{StaticResource ColorTexto}" />
+        <Setter Property="BackgroundColor" Value="{StaticResource ColorSuperficie}" />
+        <Setter Property="FontFamily" Value="OpenSansRegular" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="MinimumHeightRequest" Value="40" />
+    </Style>
+
+    <!-- ========== Contenedores ========== -->
+    <Style x:Key="Tarjeta" TargetType="Border">
+        <Setter Property="Stroke" Value="{StaticResource ColorBorde}" />
+        <Setter Property="StrokeThickness" Value="1" />
+        <Setter Property="StrokeShape" Value="RoundRectangle 8" />
+        <Setter Property="BackgroundColor" Value="{StaticResource ColorSuperficie}" />
+        <Setter Property="Padding" Value="12" />
+    </Style>
+
+    <!-- Carrito y pago: se separan del resto con fondo lila y borde morado -->
+    <Style x:Key="TarjetaResaltada" TargetType="Border" BasedOn="{StaticResource Tarjeta}">
+        <Setter Property="Stroke" Value="{StaticResource ColorPrimario}" />
+        <Setter Property="StrokeThickness" Value="2" />
+        <Setter Property="BackgroundColor" Value="{StaticResource ColorFondoCarrito}" />
+        <Setter Property="Padding" Value="16" />
+    </Style>
+
+    <Style x:Key="EtiquetaTotal" TargetType="Label" BasedOn="{StaticResource EtiquetaBase}">
+        <Setter Property="FontFamily" Value="OpenSansSemibold" />
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="TextColor" Value="{StaticResource ColorPrimario}" />
+    </Style>
+
+    <!-- Fila de una lista: la elegida se pinta de lila para que se vea cuál está seleccionada -->
+    <Style x:Key="FilaLista" TargetType="Grid">
+        <Setter Property="Padding" Value="10,8" />
+        <Setter Property="ColumnSpacing" Value="12" />
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal">
+                        <VisualState.Setters>
+                            <Setter Property="BackgroundColor" Value="Transparent" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="Selected">
+                        <VisualState.Setters>
+                            <Setter Property="BackgroundColor" Value="{StaticResource ColorPrimarioClaro}" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

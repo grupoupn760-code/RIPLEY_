@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Paleta sobria de tienda: morado oscuro para encabezado y acciones, fondo claro y texto con buen contraste. -->
+    <Color x:Key="ColorPrimario">#4B2A7B</Color>
+    <Color x:Key="ColorPrimarioOscuro">#2E1A4D</Color>
+    <Color x:Key="ColorPrimarioClaro">#EEE8F6</Color>
+    <Color x:Key="ColorFondo">#F5F4F7</Color>
+    <Color x:Key="ColorSuperficie">#FFFFFF</Color>
+    <Color x:Key="ColorBorde">#D9D3E3</Color>
+    <Color x:Key="ColorTexto">#1F1B24</Color>
+    <Color x:Key="ColorTextoSuave">#5C5666</Color>
+    <Color x:Key="ColorError">#B3261E</Color>
+    <Color x:Key="ColorErrorFondo">#FBEAEA</Color>
+    <Color x:Key="ColorExito">#1B6E33</Color>
+    <Color x:Key="ColorDeshabilitado">#E2DFE6</Color>
+    <Color x:Key="ColorAcento">#6A2FA8</Color>
+    <Color x:Key="ColorSeleccionOscuro">#3A1F63</Color>
+    <Color x:Key="ColorFondoCarrito">#F7F3FC</Color>
+    <Color x:Key="White">White</Color>
+    <Color x:Key="Black">Black</Color>
+
+</ResourceDictionary>

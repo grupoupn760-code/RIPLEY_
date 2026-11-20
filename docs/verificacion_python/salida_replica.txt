@@ -1,0 +1,74 @@
+== Estructuras ==
+[OK]    Cola FIFO
+[OK]    Lista: quitar último y reinsertar
+[OK]    AVL 100 claves ascendentes: altura 7
+[OK]    AVL clave repetida
+== Árbol del catálogo ==
+[OK]    Orden de la semilla ascendente
+[OK]    Altura 3
+[OK]    Raíz JEANS
+[OK]    4 rotaciones
+[OK]    FEPAPAYA en 2 comparaciones
+   forma: 2015372601050 | izq 2015371441190 ('2015371440865', '2015372278467') | der 2015373474714 ('2015373379330', '2072369066599')
+[OK]    9999999999999 no encontrado
+[OK]    20153734 inválido
+[OK]    Nombre "POL MC FEPAPAYA INX"
+[OK]    Nombre "Pol Mc Fepapaya Inx"
+[OK]    Nombre "Pól MC Fepápaya Inx"
+[OK]    Parcial "pol mc"
+[OK]    Consulta vacía
+[OK]    Sin coincidencias
+== Polo Rojo (catálogo ficticio) ==
+[OK]    "POLO ROJO" mismo resultado
+[OK]    "Polo Rojo" mismo resultado
+[OK]    "polo rojo" mismo resultado
+[OK]    "Pol\xf3 rojo" mismo resultado
+[OK]    "  p\xf3l\xf3   R\xd3JO  " mismo resultado
+[OK]    "Pol\xf3 rojo" mismo resultado
+[OK]    "Polo\u0301 rojo" mismo resultado
+[OK]    Esperado = 001,002
+== Carrito y deshacer ==
+[OK]    3 líneas, FALDA x2
+[OK]    Total 289.96
+[OK]    Deshacer aumento → 199.97
+[OK]    FEP1+FALDA2 = 239.97
+[OK]    ESTRE vuelve a su posición
+[OK]    FALDA vuelve a 1
+[OK]    Todo deshecho: lista y pila vacías
+[OK]    Pila vacía: Deshacer falla
+[OK]    Exceso de stock / 0 / misma cantidad rechazados sin apilar
+== Validaciones ==
+[OK]    Cantidad "0" rechazada
+[OK]    Cantidad "-1" rechazada
+[OK]    Cantidad "1.5" rechazada
+[OK]    Cantidad "100" rechazada
+[OK]    Cantidad "abc" rechazada
+[OK]    Cantidad "" rechazada
+[OK]    Cantidad "99999999999" rechazada
+[OK]    Cantidad "1 2" rechazada
+[OK]    " 7 " aceptado
+[OK]    12,50 → 12.50
+[OK]    1,234 rechazado
+[OK]    1.234,56 rechazado
+[OK]    NaN rechazado
+[OK]    4.5 aceptado
+[OK]    DNI 01234567 válido
+[OK]    DNI 1234 inválido
+[OK]    Correo abc inválido
+[OK]    Correo de prueba válido
+[OK]    Nombre con tildes/ñ/guion/apóstrofo
+== Importes ==
+[OK]    A Otra: 199.97 / 0.00
+[OK]    A Ripley: 199.97 / 179.97 / 20.00
+[OK]    A Ripley: OG 152.52 IGV 27.45
+[OK]    B TarjetaRipley: 149.96, 0.00, 127.08, 22.88
+[OK]    B OtraTarjeta: 149.96, 0.00, 127.08, 22.88
+== Cola: pico de 12 ==
+[OK]    Turnos 1..12 en orden
+[OK]    Sin mezcla de artículos
+== Grafo ==
+[OK]    511→Central 26
+[OK]    Servidor–Central caído: 34 por Almacén
+[OK]    Sin enlaces: no hay ruta
+
+Réplica Python: 63 correctas, 0 con falla. Ejecutado el 06/11/2026 20:25:00 (hora del entorno).

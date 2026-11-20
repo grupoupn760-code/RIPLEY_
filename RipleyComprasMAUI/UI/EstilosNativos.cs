@@ -1,0 +1,21 @@
+﻿namespace RipleyComprasMAUI.UI;
+
+public static class EstilosNativos
+{
+    public static void Aplicar()
+    {
+#if WINDOWS
+        Microsoft.Maui.Handlers.DatePickerHandler.Mapper.AppendToMapping("TemaClaroRipley", (handler, vista) =>
+        {
+            try
+            {
+                handler.PlatformView.RequestedTheme = Microsoft.UI.Xaml.ElementTheme.Light;
+            }
+            catch (System.Runtime.InteropServices.COMException)
+            {
+                
+            }
+        });
+#endif
+    }
+}
