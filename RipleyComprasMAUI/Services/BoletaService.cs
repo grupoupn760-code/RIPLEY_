@@ -9,15 +9,16 @@ using RipleyComprasMAUI.Structures;
 namespace RipleyComprasMAUI.Services;
 
 
+// Postventa: historial de ventas (lista), índice por número (AVL) y ventas.json.
 public class BoletaService
 {
     public const string Subproceso = "Postventa - Boleta";
     private const int AnchoBoleta = 46;
 
     private readonly JsonDataManager datos;
-    private readonly ListaEnlazada<Venta> historial = new ListaEnlazada<Venta>();         
-    private ArbolBusqueda<int, Venta> indice = new ArbolBusqueda<int, Venta>();             
-    private readonly List<Venta> rechazadas = new List<Venta>();                           
+    private readonly ListaEnlazada<Venta> historial = new ListaEnlazada<Venta>();
+    private ArbolBusqueda<int, Venta> indice = new ArbolBusqueda<int, Venta>();
+    private readonly List<Venta> rechazadas = new List<Venta>();
     private int siguienteNumero = 1;
 
     public BoletaService(JsonDataManager datos)
@@ -25,13 +26,14 @@ public class BoletaService
         this.datos = datos;
     }
 
-    public bool ArchivoDisponible { get; private set; }    
+    public bool ArchivoDisponible { get; private set; }
     public ListaEnlazada<string> Advertencias { get; } = new ListaEnlazada<string>();
     public ListaEnlazada<string> Bitacora { get; } = new ListaEnlazada<string>();
     public int CantidadVentas => historial.Cantidad;
     public int SiguienteNumero => siguienteNumero;
     public int AlturaIndice => indice.Altura;
 
+    // Lee ventas.json y reconstruye el historial y el índice.
     public bool Cargar(out string mensaje)
     {
         historial.Limpiar();
@@ -57,7 +59,7 @@ public class BoletaService
             }
             if (venta.Boleta != null && venta.Boleta.Numero > maximo)
             {
-                maximo = venta.Boleta.Numero;      
+                maximo = venta.Boleta.Numero;
             }
             if (!EsVentaValida(venta, out string motivo))
             {
@@ -125,6 +127,7 @@ public class BoletaService
         return true;
     }
 
+    // Asigna el siguiente número de boleta y la leyenda “simulada”.
     public Boleta PrepararBoleta(Venta venta)
     {
         return new Boleta
@@ -173,8 +176,8 @@ public class BoletaService
     public void PublicarVenta(Venta venta)
     {
         Boleta boleta = venta.Boleta!;
-        historial.AgregarAlFinal(venta);                 
-        indice.Insertar(boleta.Numero, venta);           
+        historial.AgregarAlFinal(venta);
+        indice.Insertar(boleta.Numero, venta);
         siguienteNumero = boleta.Numero + 1;
         Registrar("Emitir y guardar boleta", $"Boleta {boleta.Numero:D6}",
                   $"Turno {venta.Turno}, {venta.TarjetaTexto}, total final {InputHelper.FormatearSoles(venta.TotalFinal)}, ahorro {InputHelper.FormatearSoles(venta.Ahorro)}.");
@@ -182,11 +185,12 @@ public class BoletaService
 
     private List<Venta> CrearListaParaGuardar()
     {
-        List<Venta> lista = new List<Venta>(historial);  
-        lista.AddRange(rechazadas);                     
+        List<Venta> lista = new List<Venta>(historial);
+        lista.AddRange(rechazadas);
         return lista;
     }
 
+    // Busca en el árbol AVL por número de boleta. O(log n)
     public bool BuscarPorNumero(int numero, out Venta? venta, out string mensaje)
     {
         venta = null;
@@ -207,6 +211,7 @@ public class BoletaService
         return true;
     }
 
+    // Recorre el historial comparando el DNI exacto. O(n)
     public ListaEnlazada<Venta> BuscarPorDni(string dni, out string mensaje)
     {
         ListaEnlazada<Venta> encontradas = new ListaEnlazada<Venta>();
@@ -219,7 +224,7 @@ public class BoletaService
 
         foreach (Venta venta in historial)
         {
-            if (venta.Dni == dni)                        
+            if (venta.Dni == dni)
             {
                 encontradas.AgregarAlFinal(venta);
             }
@@ -232,6 +237,7 @@ public class BoletaService
         return encontradas;
     }
 
+    // Recorre el historial filtrando por fecha. O(n)
     public ListaEnlazada<Venta> BuscarPorFecha(DateTime fecha, out string mensaje)
     {
         ListaEnlazada<Venta> encontradas = new ListaEnlazada<Venta>();
@@ -255,11 +261,12 @@ public class BoletaService
         ListaEnlazada<Venta> recientes = new ListaEnlazada<Venta>();
         foreach (Venta venta in historial)
         {
-            recientes.AgregarAlInicio(venta);          
+            recientes.AgregarAlInicio(venta);
         }
         return recientes;
     }
 
+    // Arma el texto de la boleta simulada.
     public string ObtenerComprobante(Venta venta)
     {
         Boleta? boleta = venta.Boleta;

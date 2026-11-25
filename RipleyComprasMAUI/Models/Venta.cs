@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace RipleyComprasMAUI.Models;
 
+// Estados de una compra: en fila, en caja y finalizada.
 public enum EstadoVenta
 {
     EnFila,
@@ -12,6 +13,7 @@ public enum EstadoVenta
 }
 
 
+// Tarjeta elegida en caja; define el precio aplicado.
 public enum TipoTarjeta
 {
     SinSeleccionar,
@@ -19,15 +21,17 @@ public enum TipoTarjeta
     OtraTarjeta
 }
 
+// Compra de un cliente: turno, datos opcionales, artículos, tarjeta, importes y su boleta.
 public class Venta
 {
-    public Guid Id { get; set; }                            
-    public int Turno { get; set; }                           
-    public string? NombreCliente { get; set; }               
-    public string? Dni { get; set; }                          
+    public Guid Id { get; set; }
+    public int Turno { get; set; }
+    public string? NombreCliente { get; set; }
+    public string? Dni { get; set; }
     public string? Correo { get; set; }
     public EstadoVenta Estado { get; set; } = EstadoVenta.EnFila;
-    public List<ItemCarrito> Articulos { get; set; } = new();  
+    // List solo para guardar en JSON; las operaciones usan ListaEnlazada (ver CarritoService).
+    public List<ItemCarrito> Articulos { get; set; } = new();
     public TipoTarjeta Tarjeta { get; set; } = TipoTarjeta.SinSeleccionar;
     public DateTime FechaLlegada { get; set; }
     public decimal TotalRegular { get; set; }
@@ -35,7 +39,7 @@ public class Venta
     public decimal TotalFinal { get; set; }
     public decimal OperacionGravada { get; set; }
     public decimal Igv { get; set; }
-    public Boleta? Boleta { get; set; }                        
+    public Boleta? Boleta { get; set; }
 
     [JsonIgnore]
     public string ClienteTexto => string.IsNullOrWhiteSpace(NombreCliente) ? "Cliente anónimo" : NombreCliente;

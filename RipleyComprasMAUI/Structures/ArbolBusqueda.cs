@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace RipleyComprasMAUI.Structures;
 
+// Árbol AVL propio: catálogo por código y boletas por número. Se mantiene balanceado.
 public class ArbolBusqueda<TClave, TValor>
 {
     private readonly IComparer<TClave> comparador;
@@ -16,11 +17,12 @@ public class ArbolBusqueda<TClave, TValor>
 
     public int Cantidad { get; private set; }
     public int Altura => AlturaDe(raiz);
-    public int Rotaciones { get; private set; }             
-    public int UltimasComparaciones { get; private set; }    
+    public int Rotaciones { get; private set; }
+    public int UltimasComparaciones { get; private set; }
     public bool EstaVacio => raiz == null;
     public TClave? ClaveRaiz => raiz == null ? default : raiz.Clave;
 
+    // Inserta la clave y rebalancea si hace falta. O(log n)
     public bool Insertar(TClave clave, TValor valor)
     {
         bool insertado = false;
@@ -37,7 +39,7 @@ public class ArbolBusqueda<TClave, TValor>
         if (nodo == null)
         {
             insertado = true;
-            return new NodoArbol<TClave, TValor>(clave, valor);      
+            return new NodoArbol<TClave, TValor>(clave, valor);
         }
 
         int comparacion = comparador.Compare(clave, nodo.Clave);
@@ -51,12 +53,13 @@ public class ArbolBusqueda<TClave, TValor>
         }
         else
         {
-            return nodo;                                             
+            return nodo;
         }
 
-        return Balancear(nodo);                                      
+        return Balancear(nodo);
     }
 
+    // Baja comparando: menor a la izquierda, mayor a la derecha. O(log n)
     public bool Buscar(TClave clave, out TValor? valor)
     {
         UltimasComparaciones = 0;
@@ -78,6 +81,7 @@ public class ArbolBusqueda<TClave, TValor>
         return false;
     }
 
+    // Devuelve los valores ordenados por clave (recorrido inorden). O(n)
     public ListaEnlazada<TValor> RecorrerInOrden()
     {
         ListaEnlazada<TValor> resultado = new ListaEnlazada<TValor>();
@@ -113,43 +117,46 @@ public class ArbolBusqueda<TClave, TValor>
         return AlturaDe(nodo.Izquierdo) - AlturaDe(nodo.Derecho);
     }
 
+    // Si el factor de equilibrio pasa de 1, aplica rotación simple o doble.
     private NodoArbol<TClave, TValor> Balancear(NodoArbol<TClave, TValor> nodo)
     {
         ActualizarAltura(nodo);
         int factor = FactorEquilibrio(nodo);
 
-        if (factor > 1)                                   
+        if (factor > 1)
         {
             if (FactorEquilibrio(nodo.Izquierdo!) < 0)
             {
-                nodo.Izquierdo = RotarIzquierda(nodo.Izquierdo!);   
+                nodo.Izquierdo = RotarIzquierda(nodo.Izquierdo!);
             }
             return RotarDerecha(nodo);
         }
 
-        if (factor < -1)                                   
+        if (factor < -1)
         {
             if (FactorEquilibrio(nodo.Derecho!) > 0)
             {
-                nodo.Derecho = RotarDerecha(nodo.Derecho!);        
+                nodo.Derecho = RotarDerecha(nodo.Derecho!);
             }
             return RotarIzquierda(nodo);
         }
 
-        return nodo;                                      
+        return nodo;
     }
 
+    // Rotación a la derecha (el hijo izquierdo sube). O(1)
     private NodoArbol<TClave, TValor> RotarDerecha(NodoArbol<TClave, TValor> nodo)
     {
         NodoArbol<TClave, TValor> hijo = nodo.Izquierdo!;
         nodo.Izquierdo = hijo.Derecho;
         hijo.Derecho = nodo;
-        ActualizarAltura(nodo);          
+        ActualizarAltura(nodo);
         ActualizarAltura(hijo);
         Rotaciones++;
-        return hijo;                   
+        return hijo;
     }
 
+    // Rotación a la izquierda (el hijo derecho sube). O(1)
     private NodoArbol<TClave, TValor> RotarIzquierda(NodoArbol<TClave, TValor> nodo)
     {
         NodoArbol<TClave, TValor> hijo = nodo.Derecho!;

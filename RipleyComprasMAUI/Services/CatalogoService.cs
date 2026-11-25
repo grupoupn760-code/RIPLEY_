@@ -9,11 +9,12 @@ using RipleyComprasMAUI.Structures;
 namespace RipleyComprasMAUI.Services;
 
 
+// Catálogo: carga productos.json en un árbol AVL por código y maneja el stock.
 public class CatalogoService
 {
     private readonly JsonDataManager datos;
     private ArbolBusqueda<string, Producto> arbol = new ArbolBusqueda<string, Producto>(StringComparer.Ordinal);
-    private readonly List<Producto> rechazados = new List<Producto>();   
+    private readonly List<Producto> rechazados = new List<Producto>();
 
     public CatalogoService(JsonDataManager datos)
     {
@@ -30,6 +31,7 @@ public class CatalogoService
     public int UltimasComparaciones => arbol.UltimasComparaciones;
     public string? CodigoRaiz => arbol.ClaveRaiz;
 
+    // Lee productos.json, valida cada prenda y la inserta en el árbol.
     public bool Cargar(out string mensaje)
     {
         arbol = new ArbolBusqueda<string, Producto>(StringComparer.Ordinal);
@@ -102,6 +104,7 @@ public class CatalogoService
         return true;
     }
 
+    // Valida el código y lo busca en el árbol. O(log n)
     public bool BuscarPorCodigo(string? texto, out Producto? producto, out string mensaje)
     {
         producto = null;
@@ -118,6 +121,7 @@ public class CatalogoService
         return true;
     }
 
+    // Recorre el catálogo sin distinguir mayúsculas ni tildes. O(n)
     public ListaEnlazada<Producto> BuscarPorNombre(string? texto, out string mensaje)
     {
         ListaEnlazada<Producto> encontrados = new ListaEnlazada<Producto>();
@@ -156,6 +160,7 @@ public class CatalogoService
         return ObtenerProducto(codigo, out Producto? producto) ? producto!.Stock : 0;
     }
 
+    // Vuelve a validar el stock antes de confirmar el pago.
     public bool HayStockSuficiente(IEnumerable<ItemCarrito> articulos, out string conflictos)
     {
         StringBuilder detalle = new StringBuilder();
@@ -171,13 +176,14 @@ public class CatalogoService
         return conflictos.Length == 0;
     }
 
+    // Guarda productos.json con el stock ya descontado.
     public bool GuardarConDescuento(IEnumerable<ItemCarrito> articulos, out string error)
     {
         if (!datos.GuardarProductos(CrearListaParaGuardar(articulos), out error))
         {
             return false;
         }
-        StockPendienteDeGuardar = false;   
+        StockPendienteDeGuardar = false;
         return true;
     }
 
@@ -222,7 +228,7 @@ public class CatalogoService
                 Stock = producto.Stock - vendido
             });
         }
-        lista.AddRange(rechazados);     
+        lista.AddRange(rechazados);
         return lista;
     }
 }

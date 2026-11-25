@@ -3,12 +3,13 @@ using System.Globalization;
 
 namespace RipleyComprasMAUI.Structures;
 
+// Grafo ponderado con listas de adyacencia: red de cajas con tiempos en ms (complemento).
 public class GrafoCajas
 {
     public class Enlace
     {
-        public int Destino { get; }         
-        public double Peso { get; set; }    
+        public int Destino { get; }
+        public double Peso { get; set; }
         public bool Activo { get; set; }
 
         public Enlace(int destino, double peso)
@@ -19,8 +20,8 @@ public class GrafoCajas
         }
     }
 
-    private readonly string[] nombres;                       
-    private readonly ListaEnlazada<Enlace>[] adyacencia;    
+    private readonly string[] nombres;
+    private readonly ListaEnlazada<Enlace>[] adyacencia;
     private int cantidad;
 
     public GrafoCajas(int capacidad)
@@ -49,6 +50,7 @@ public class GrafoCajas
     }
 
 
+    // Crea un enlace en ambos sentidos con su tiempo.
     public bool Conectar(int a, int b, double peso)
     {
         if (!EsIndiceValido(a) || !EsIndiceValido(b) || a == b || peso <= 0 || BuscarEnlace(a, b) != null)
@@ -60,6 +62,7 @@ public class GrafoCajas
         return true;
     }
 
+    // Activa o desactiva un enlace existente (un enlace caído no se usa en la ruta).
     public bool CambiarEstadoEnlace(int a, int b, bool activo, out string mensaje)
     {
         Enlace? ida = BuscarEnlace(a, b);
@@ -96,6 +99,7 @@ public class GrafoCajas
     }
 
 
+    // Dijkstra: elige en cada paso la caja no visitada más cercana. O(V² + E)
     public bool BuscarRutaMinima(int origen, int destino, out ListaEnlazada<int> ruta, out double distanciaTotal)
     {
         ruta = new ListaEnlazada<int>();
@@ -118,7 +122,7 @@ public class GrafoCajas
         for (int paso = 0; paso < cantidad; paso++)
         {
             int actual = -1;
-            for (int i = 0; i < cantidad; i++)      
+            for (int i = 0; i < cantidad; i++)
             {
                 if (!visitado[i] && (actual == -1 || distancia[i] < distancia[actual]))
                 {
@@ -127,24 +131,24 @@ public class GrafoCajas
             }
             if (actual == -1 || double.IsPositiveInfinity(distancia[actual]))
             {
-                break;                              
+                break;
             }
             visitado[actual] = true;
             if (actual == destino)
             {
-                break;                               
+                break;
             }
 
             foreach (Enlace enlace in adyacencia[actual])
             {
                 if (!enlace.Activo || visitado[enlace.Destino])
                 {
-                    continue;                       
+                    continue;
                 }
                 double candidata = distancia[actual] + enlace.Peso;
                 if (candidata < distancia[enlace.Destino])
                 {
-                    distancia[enlace.Destino] = candidata;  
+                    distancia[enlace.Destino] = candidata;
                     previo[enlace.Destino] = actual;
                 }
             }
@@ -152,12 +156,12 @@ public class GrafoCajas
 
         if (double.IsPositiveInfinity(distancia[destino]))
         {
-            return false;                         
+            return false;
         }
 
         for (int caja = destino; caja != -1; caja = previo[caja])
         {
-            ruta.AgregarAlInicio(caja);             
+            ruta.AgregarAlInicio(caja);
         }
         distanciaTotal = distancia[destino];
         return true;
@@ -190,6 +194,7 @@ public class GrafoCajas
         return lineas;
     }
 
+    // Red de ejemplo: cajas 511, 512 y 513, servidor, almacén y central.
     public static GrafoCajas CrearEjemplo()
     {
         GrafoCajas grafo = new GrafoCajas(6);
@@ -217,7 +222,7 @@ public class GrafoCajas
         {
             return null;
         }
-        return adyacencia[a].Buscar(enlace => enlace.Destino == b);   
+        return adyacencia[a].Buscar(enlace => enlace.Destino == b);
     }
 
     private bool EsIndiceValido(int indice)

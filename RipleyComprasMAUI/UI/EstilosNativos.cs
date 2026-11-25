@@ -13,7 +13,8 @@ public static class EstilosNativos
             }
             catch (System.Runtime.InteropServices.COMException)
             {
-                
+                // En algunos equipos WinUI no permite cambiar el tema del calendario y lanza COMException.
+                // Se ignora a propósito: el calendario se queda con el tema de Windows y la app sigue funcionando.
             }
         });
 #endif

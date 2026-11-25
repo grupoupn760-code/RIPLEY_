@@ -6,18 +6,19 @@ using RipleyComprasMAUI.Structures;
 
 namespace RipleyComprasMAUI.Services;
 
+// Venta: fila de compras (cola), tarjeta, importes y pago simulado.
 public class CompraService
 {
     public const string Subproceso = "Venta - Pago";
-    private const decimal FactorIgv = 1.18m;         
+    private const decimal FactorIgv = 1.18m;
 
     private readonly CarritoService carritos;
     private readonly CatalogoService catalogo;
     private readonly BoletaService boletas;
     private readonly ColaCompras<Venta> fila = new ColaCompras<Venta>();
     private int siguienteTurno = 1;
-    private ContextoCarrito? correccion;             
-    private bool confirmando;                        
+    private ContextoCarrito? correccion;
+    private bool confirmando;
 
     public CompraService(CarritoService carritos, CatalogoService catalogo, BoletaService boletas)
     {
@@ -36,6 +37,7 @@ public class CompraService
         return new List<Venta>(fila);
     }
 
+    // “Enviar a caja”: valida datos opcionales y encola la compra. O(1)
     public bool RegistrarLlegada(string? nombre, string? dni, string? correo, out Venta? venta, out string mensaje)
     {
         venta = null;
@@ -64,18 +66,19 @@ public class CompraService
             Correo = correoValido,
             Estado = EstadoVenta.EnFila,
             FechaLlegada = DateTime.Now,
-            Articulos = carritos.CopiarArticulos(carrito)     
+            Articulos = carritos.CopiarArticulos(carrito)
         };
         siguienteTurno++;
-        CalcularImportes(venta);                             
-        fila.Encolar(venta);                                 
-        carritos.NuevoCarrito();                            
+        CalcularImportes(venta);
+        fila.Encolar(venta);
+        carritos.NuevoCarrito();
 
         mensaje = $"Turno {venta.Turno} ({venta.ClienteTexto}) enviado a caja con {venta.Articulos.Count} producto(s). Clientes en fila: {fila.Cantidad}.";
         Registrar("Registrar llegada", $"Turno {venta.Turno}", mensaje);
         return true;
     }
 
+    // Desencola al primero de la fila y lo pone en caja. O(1)
     public bool AtenderSiguiente(out string mensaje)
     {
         if (CompraEnAtencion != null)
@@ -91,7 +94,7 @@ public class CompraService
             return false;
         }
 
-        Venta venta = fila.Desencolar();                     
+        Venta venta = fila.Desencolar();
         venta.Estado = EstadoVenta.EnAtencion;
         CompraEnAtencion = venta;
         correccion = carritos.CrearContextoDeCorreccion(venta.Articulos, $"Turno {venta.Turno} (corrección en caja)");
@@ -102,6 +105,7 @@ public class CompraService
         return true;
     }
 
+    // Guarda la tarjeta y recalcula los importes.
     public bool SeleccionarTarjeta(TipoTarjeta tarjeta, out string mensaje)
     {
         Venta? venta = CompraEnAtencion;
@@ -124,27 +128,29 @@ public class CompraService
         return true;
     }
 
+    // Tarjeta Ripley → precio especial; otra tarjeta → precio regular.
     public static decimal PrecioSegunTarjeta(ItemCarrito articulo, TipoTarjeta tarjeta)
     {
         return tarjeta == TipoTarjeta.TarjetaRipley ? articulo.PrecioTarjetaRipley : articulo.PrecioRegular;
     }
 
+    // Total regular, total final, ahorro, op. gravada = total/1.18 e IGV = total − op. gravada. O(m)
     public static void CalcularImportes(Venta venta)
     {
         decimal totalRegular = 0;
         decimal totalFinal = 0;
         foreach (ItemCarrito articulo in venta.Articulos)
         {
-            articulo.PrecioAplicado = PrecioSegunTarjeta(articulo, venta.Tarjeta);  
+            articulo.PrecioAplicado = PrecioSegunTarjeta(articulo, venta.Tarjeta);
             totalRegular += articulo.SubtotalRegular;
             totalFinal += articulo.SubtotalAplicado;
         }
 
         venta.TotalRegular = totalRegular;
         venta.TotalFinal = totalFinal;
-        venta.Ahorro = totalRegular - totalFinal;                
+        venta.Ahorro = totalRegular - totalFinal;
         venta.OperacionGravada = Redondear(totalFinal / FactorIgv);
-        venta.Igv = totalFinal - venta.OperacionGravada;        
+        venta.Igv = totalFinal - venta.OperacionGravada;
     }
 
     private static decimal Redondear(decimal monto)
@@ -164,6 +170,7 @@ public class CompraService
 
 
 
+    // Corrección en caja (por ejemplo, si falta stock); se puede deshacer.
     public bool CorregirCantidad(string codigo, int nuevaCantidad, out string mensaje)
     {
         if (CompraEnAtencion == null || correccion == null)
@@ -233,6 +240,7 @@ public class CompraService
     }
 
 
+    // Revalida stock, emite la boleta, guarda ventas.json y productos.json; si algo falla, revierte.
     public bool ConfirmarPagoSimulado(out Venta? ventaFinalizada, out string mensaje)
     {
         ventaFinalizada = null;
@@ -266,7 +274,7 @@ public class CompraService
         confirmando = true;
         try
         {
-            CalcularImportes(venta);                               
+            CalcularImportes(venta);
 
             if (!catalogo.HayStockSuficiente(venta.Articulos, out string conflictos))
             {
@@ -297,8 +305,8 @@ public class CompraService
                 catalogo.MarcarStockPendiente();
             }
 
-            boletas.PublicarVenta(venta);                 
-            catalogo.AplicarDescuento(venta.Articulos);   
+            boletas.PublicarVenta(venta);
+            catalogo.AplicarDescuento(venta.Articulos);
             CompraEnAtencion = null;
             correccion = null;
             ventaFinalizada = venta;

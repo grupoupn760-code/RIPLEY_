@@ -5,11 +5,12 @@ using RipleyComprasMAUI.Structures;
 
 namespace RipleyComprasMAUI.Services;
 
+// Tipos de acción que se apilan para poder deshacerlas.
 public enum TipoAccionCarrito
 {
-    AgregarLinea,       
-    CambiarCantidad,    
-    QuitarLinea       
+    AgregarLinea,
+    CambiarCantidad,
+    QuitarLinea
 }
 
 
@@ -17,13 +18,14 @@ public class AccionCarrito
 {
     public TipoAccionCarrito Tipo { get; init; }
     public string Codigo { get; init; } = "";
-    public int CantidadAnterior { get; init; }          
-    public int Posicion { get; init; }                
-    public ItemCarrito? ArticuloQuitado { get; init; }  
+    public int CantidadAnterior { get; init; }
+    public int Posicion { get; init; }
+    public ItemCarrito? ArticuloQuitado { get; init; }
     public string Descripcion { get; init; } = "";
 }
 
 
+// Un carrito: sus artículos (ListaEnlazada) y su pila de acciones.
 public class ContextoCarrito
 {
     public ContextoCarrito(string referencia)
@@ -31,17 +33,18 @@ public class ContextoCarrito
         Referencia = referencia;
     }
 
-    public string Referencia { get; }                                                  
-    internal ListaEnlazada<ItemCarrito> Lista { get; } = new ListaEnlazada<ItemCarrito>();   
+    public string Referencia { get; }
+    internal ListaEnlazada<ItemCarrito> Lista { get; } = new ListaEnlazada<ItemCarrito>();
     internal PilaAcciones<AccionCarrito> Pila { get; } = new PilaAcciones<AccionCarrito>();
 
-    public IEnumerable<ItemCarrito> Articulos => Lista;      
+    public IEnumerable<ItemCarrito> Articulos => Lista;
     public int CantidadLineas => Lista.Cantidad;
     public bool EstaVacio => Lista.EstaVacia;
     public int AccionesParaDeshacer => Pila.Cantidad;
 }
 
 
+// Reglas del carrito: agregar, cambiar, quitar y deshacer.
 public class CarritoService
 {
     public const string Subproceso = "Preventa - Selección de productos";
@@ -66,6 +69,7 @@ public class CarritoService
         Actual = new ContextoCarrito($"Carrito {numeroCarrito}");
     }
 
+    // Valida código, cantidad y stock; agrega a la lista y apila la acción.
     public bool AgregarPrenda(ContextoCarrito carrito, string codigo, int cantidad, out string mensaje)
     {
         if (!InputHelper.EsCodigoValido(codigo))
@@ -87,7 +91,7 @@ public class CarritoService
             return false;
         }
 
-        ItemCarrito? existente = carrito.Lista.Buscar(articulo => articulo.Codigo == codigo);   
+        ItemCarrito? existente = carrito.Lista.Buscar(articulo => articulo.Codigo == codigo);
         int cantidadAnterior = existente == null ? 0 : existente.Cantidad;
         int nuevaCantidad = cantidadAnterior + cantidad;
 
@@ -130,7 +134,7 @@ public class CarritoService
                 CantidadAnterior = cantidadAnterior,
                 Descripcion = $"{producto.Nombre} de {cantidadAnterior} a {nuevaCantidad}"
             });
-            existente.Cantidad = nuevaCantidad;      
+            existente.Cantidad = nuevaCantidad;
         }
 
         mensaje = $"Se agregó {producto.Nombre} x {cantidad}. Cantidad en el carrito: {nuevaCantidad}.";
@@ -138,6 +142,7 @@ public class CarritoService
         return true;
     }
 
+    // Cambia la cantidad y apila la cantidad anterior.
     public bool CambiarCantidad(ContextoCarrito carrito, string codigo, int nuevaCantidad, out string mensaje)
     {
         ItemCarrito? articulo = carrito.Lista.Buscar(item => item.Codigo == codigo);
@@ -180,6 +185,7 @@ public class CarritoService
         return true;
     }
 
+    // Quita la prenda de la lista y apila su posición para poder reponerla.
     public bool QuitarPrenda(ContextoCarrito carrito, string codigo, out string mensaje)
     {
         if (!carrito.Lista.Eliminar(item => item.Codigo == codigo, out ItemCarrito? quitado, out int posicion) || quitado == null)
@@ -203,6 +209,7 @@ public class CarritoService
         return true;
     }
 
+    // Desapila la última acción y la revierte (LIFO).
     public bool Deshacer(ContextoCarrito carrito, out string mensaje)
     {
         if (carrito.Pila.EstaVacia)
@@ -212,7 +219,7 @@ public class CarritoService
             return false;
         }
 
-        AccionCarrito accion = carrito.Pila.Desapilar();     
+        AccionCarrito accion = carrito.Pila.Desapilar();
         switch (accion.Tipo)
         {
             case TipoAccionCarrito.AgregarLinea:
@@ -249,6 +256,7 @@ public class CarritoService
         Registrar(carrito, "Vaciar carrito", mensaje);
     }
 
+    // Recorre la lista y suma precio regular × cantidad. O(m)
     public decimal CalcularTotalRegular(ContextoCarrito carrito)
     {
         decimal total = 0;
