@@ -384,11 +384,12 @@ public static class InputHelper
             }
             if (char.IsWhiteSpace(c))
             {
-                espacioPendiente = resultado.Length > 0;     
+                espacioPendiente = resultado.Length > 0;
+                continue;   // el espacio se agrega una sola vez, antes de la siguiente letra
             }
             if (espacioPendiente)
             {
-                resultado.Append(' ');                      
+                resultado.Append(' ');
                 espacioPendiente = false;
             }
             resultado.Append(char.ToUpperInvariant(c));
